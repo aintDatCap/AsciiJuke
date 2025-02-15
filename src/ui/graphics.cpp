@@ -18,6 +18,7 @@ BasicWindow::BasicWindow(int32_t height, int32_t width, bool bordered) {
         this->window = newwin(height, width, 0, 0);
         refresh();
     }
+    this->bordered = bordered;
 }
 
 BasicWindow::~BasicWindow() {
@@ -25,12 +26,11 @@ BasicWindow::~BasicWindow() {
 }
 
 void BasicWindow::resize_window(int32_t new_height, int32_t new_width) {
-    delwin(this->window);
-    if (bordered) {
-        this->window = new_bordered_window(new_height, new_width, 0, 0);
-    } else {
-        this->window = newwin(new_height, new_width, 0, 0);
-        refresh();
+    werase(this->window);
+    wresize(this->window, new_height, new_width);
+
+    if(bordered) {
+        box(this->window, 0, 0);
     }
 }
 
