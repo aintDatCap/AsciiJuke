@@ -25,6 +25,14 @@ BasicWindow::~BasicWindow() {
     delwin(this->window);
 }
 
+void BasicWindow::resize_window(int32_t new_height, int32_t new_width) {
+    wresize(this->window, new_height, new_width);
+
+    if(bordered) {
+        box(this->window, 0, 0);
+    }
+}
+
 void put_centered_text(WINDOW *win, const char *text) {
     mvwprintw(win, getmaxy(win) / 2, (getmaxx(win) - strlen(text)) / 2, "%s", text);
 }
