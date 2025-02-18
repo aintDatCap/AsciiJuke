@@ -33,7 +33,65 @@ MainMenu::~MainMenu() {
 }
 
 UserSelection MainMenu::wait_for_user_selection() {
-    wgetch(this->window);
+    keypad(stdscr, true);
+    
+    int32_t c;
+    while (true) {
+        c = wgetch(stdscr);
+        if (c == KEY_MOUSE) {
+            MEVENT mouse_event;
+            if (getmouse(&mouse_event) == OK) {
+                // left button clicked
+                if (mouse_event.bstate & BUTTON1_CLICKED || mouse_event.bstate & BUTTON1_PRESSED) {
+
+                    if (is_inside_window(this->exit_button, mouse_event.x, mouse_event.y)) {
+                        return USER_SELECTION_EXIT;
+                    }
+                }
+            }
+        } else if (c == KEY_RESIZE) {
+
+            int32_t width, height;
+            getmaxyx(stdscr, height, width);
+
+            wresize(this->window, height, width);
+            werase(this->window);
+
+            refresh();
+
+            if(bordered) {
+                box(this->window, 0, 0);
+            }
+            wrefresh(this->window);
+
+            const int32_t button_width = width / 5;
+            const int32_t button_height = height / 6;
+
+
+            wresize(this->exit_button, button_height, button_width);
+            werase(this->exit_button);
+            mvwin(this->exit_button, height / 2, width / 2 - button_width / 2);
+            refresh();
+
+
+            box(this->exit_button, 0, 0);
+            put_centered_colored_text(this->exit_button, "EXIT", RED_TEXT);
+
+            wrefresh(this->exit_button);
+
+            const char *logo[] = {
+                R"(   _            _ _  __        _        )", //
+                R"(  /_\  ___  ___(_|_) \ \ _   _| | _____ )", //
+                R"( //_\\/ __|/ __| | |  \ \ | | | |/ / _ \)", //
+                R"(/  _  \__ \ (__| | /\_/ / |_| |   <  __/)", //
+                R"(\_/ \_/___/\___|_|_\___/ \__,_|_|\_\___|)", //
+            };
+
+            draw_art(this->window, logo, 5, height / 7, (width - strlen(logo[0])) / 2, BLUE_TEXT);
+
+        }
+    }
+
     return USER_SELECTION_EXIT;
 }
 
