@@ -33,9 +33,11 @@ MainMenu::~MainMenu() {
 }
 
 UserSelection MainMenu::wait_for_user_selection() {
-
-    int32_t c = wgetch(stdscr);
+    keypad(stdscr, true);
+    
+    int32_t c;
     while (true) {
+        c = wgetch(stdscr);
         if (c == KEY_MOUSE) {
             MEVENT mouse_event;
             if (getmouse(&mouse_event) == OK) {
@@ -49,17 +51,30 @@ UserSelection MainMenu::wait_for_user_selection() {
             }
         } else if (c == KEY_RESIZE) {
 
-            delwin(this->exit_button);
-
             int32_t width, height;
             getmaxyx(stdscr, height, width);
-            resize_window(height, width);
+
+            wresize(this->window, height, width);
+            werase(this->window);
+
+            refresh();
+
+            if(bordered) {
+                box(this->window, 0, 0);
+            }
+            wrefresh(this->window);
 
             const int32_t button_width = width / 5;
             const int32_t button_height = height / 6;
 
-            this->exit_button =
-                new_bordered_window(button_height, button_width, height / 2, width / 2 - button_width / 2);
+
+            wresize(this->exit_button, button_height, button_width);
+            werase(this->exit_button);
+            mvwin(this->exit_button, height / 2, width / 2 - button_width / 2);
+            refresh();
+
+
+            box(this->exit_button, 0, 0);
             put_centered_colored_text(this->exit_button, "EXIT", RED_TEXT);
 
             wrefresh(this->exit_button);
