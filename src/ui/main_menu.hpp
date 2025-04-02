@@ -9,7 +9,7 @@ namespace UI {
 
 class MainMenu : BasicWindow {
   private:
-    WINDOW *exit_button;
+    DynamicWindow *exit_button;
 
   public:
     MainMenu(int32_t height, int32_t width);

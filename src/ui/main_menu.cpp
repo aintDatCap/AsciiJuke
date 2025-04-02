@@ -12,10 +12,8 @@ MainMenu::MainMenu(int32_t height, int32_t width) : BasicWindow(height, width, t
     const int32_t button_width = width / 5;
     const int32_t button_height = height / 6;
 
-    this->exit_button = new_bordered_window(button_height, button_width, height / 2, width / 2 - button_width / 2);
-    put_centered_colored_text(this->exit_button, "EXIT", RED_TEXT);
-
-    wrefresh(this->exit_button);
+    this->exit_button = new DynamicWindow(1.f / 6, 1.f / 5, 1.f / 2, 1.f / 2 - 1.f / 10, true);
+    this->exit_button->set_colored_text("EXIT", RED_TEXT);
 
     const char *logo[] = {
         R"(   _            _ _  __        _        )", //
@@ -29,27 +27,30 @@ MainMenu::MainMenu(int32_t height, int32_t width) : BasicWindow(height, width, t
 }
 
 MainMenu::~MainMenu() {
-    delwin(this->exit_button);
+    delete this->exit_button;
 }
 
 UserSelection MainMenu::wait_for_user_selection() {
     keypad(stdscr, true);
-    
+
     int32_t c;
     while (true) {
         c = wgetch(stdscr);
         if (c == KEY_MOUSE) {
             MEVENT mouse_event;
             if (getmouse(&mouse_event) == OK) {
-                // left button clicked
+                // If the left mouse button has been clicked
                 if (mouse_event.bstate & BUTTON1_CLICKED || mouse_event.bstate & BUTTON1_PRESSED) {
 
-                    if (is_inside_window(this->exit_button, mouse_event.x, mouse_event.y)) {
+                    // Checking if the exit button has been pressed
+                    if (this->exit_button->mouse_event_inside(mouse_event)) {
                         return USER_SELECTION_EXIT;
                     }
                 }
             }
         } else if (c == KEY_RESIZE) {
+
+            // Handling screen resizing
 
             int32_t width, height;
             getmaxyx(stdscr, height, width);
@@ -59,7 +60,7 @@ UserSelection MainMenu::wait_for_user_selection() {
 
             refresh();
 
-            if(bordered) {
+            if (bordered) {
                 box(this->window, 0, 0);
             }
             wrefresh(this->window);
@@ -67,17 +68,8 @@ UserSelection MainMenu::wait_for_user_selection() {
             const int32_t button_width = width / 5;
             const int32_t button_height = height / 6;
 
-
-            wresize(this->exit_button, button_height, button_width);
-            werase(this->exit_button);
-            mvwin(this->exit_button, height / 2, width / 2 - button_width / 2);
-            refresh();
-
-
-            box(this->exit_button, 0, 0);
-            put_centered_colored_text(this->exit_button, "EXIT", RED_TEXT);
-
-            wrefresh(this->exit_button);
+            this->exit_button->render();
+            this->exit_button->set_colored_text("EXIT", RED_TEXT);
 
             const char *logo[] = {
                 R"(   _            _ _  __        _        )", //
@@ -88,7 +80,6 @@ UserSelection MainMenu::wait_for_user_selection() {
             };
 
             draw_art(this->window, logo, 5, height / 7, (width - strlen(logo[0])) / 2, BLUE_TEXT);
-
         }
     }
 

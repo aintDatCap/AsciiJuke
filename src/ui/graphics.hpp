@@ -1,6 +1,7 @@
 #ifndef GRAPHICS_HPP
 #define GRAPHICS_HPP
 
+#include <cmath>
 #include <cstdint>
 #include <ctime>
 
@@ -24,7 +25,6 @@ typedef enum {
     USER_SELECTION_,
 } UserSelection;
 
-
 class BasicWindow {
   protected:
     WINDOW *window;
@@ -34,6 +34,27 @@ class BasicWindow {
   public:
     BasicWindow(int32_t height, int32_t width, bool bordered);
     ~BasicWindow();
+};
+
+class DynamicWindow {
+  protected:
+    WINDOW *window;
+
+    bool bordered;
+    float_t relative_height;
+    float_t relative_width;
+    float_t relative_start_y;
+    float_t relative_start_x;
+
+  public:
+    DynamicWindow(float_t relative_height, float_t relative_width, float_t relative_start_y, float_t relative_start_x,
+                  bool bordered);
+    ~DynamicWindow();
+
+    void render();
+    bool mouse_event_inside(MEVENT mouse_event);
+    void set_text(const char *text);
+    void set_colored_text(const char *text, UIColorId color_id);
 };
 
 /**

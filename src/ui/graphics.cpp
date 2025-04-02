@@ -33,6 +33,59 @@ void BasicWindow::resize_window(int32_t new_height, int32_t new_width) {
     }
 }
 
+
+DynamicWindow::DynamicWindow(float_t relative_height, float_t relative_width, float_t relative_start_y, float_t relative_start_x, bool bordered){
+    assert(relative_height >= 0 && relative_height <=1 && "The relative_height paramether should be a float between 0 and 1");
+    assert(relative_width >= 0 && relative_width <=1 && "The relative_width paramether should be a float between 0 and 1");
+    assert(relative_start_y >= 0 && relative_start_y <=1 && "The relative_start_y paramether should be a float between 0 and 1");
+    assert(relative_start_x >= 0 && relative_start_x <=1 && "The relative_start_x paramether should be a float between 0 and 1");
+    
+    this->relative_height = relative_height;
+    this->relative_width = relative_width;
+    this->relative_start_y = relative_start_y;
+    this->relative_start_x = relative_start_x;
+
+    int32_t stdscr_height, stdscr_width;
+    getmaxyx(stdscr, stdscr_height, stdscr_width);
+
+    if (bordered) {
+        this->window = new_bordered_window(stdscr_height * relative_height, stdscr_width * relative_width, stdscr_height * relative_start_y, stdscr_width * relative_start_x);
+    } else {
+        this->window = newwin(stdscr_height * relative_height, stdscr_width * relative_width, stdscr_height * relative_start_y, stdscr_width * relative_start_x);
+        refresh();
+    }
+    this->bordered = bordered;
+}
+
+DynamicWindow::~DynamicWindow() {
+    delwin(this->window);
+}
+
+void DynamicWindow::render() {
+    int32_t stdscr_height, stdscr_width;
+    getmaxyx(stdscr, stdscr_height, stdscr_width);
+
+    werase(this->window);
+    wresize(this->window, stdscr_height * relative_height, stdscr_width * relative_width);
+    mvwin(this->window, stdscr_height * relative_start_y, stdscr_width * relative_start_x);
+
+    if(this->bordered){
+        box(this->window, 0, 0);
+    }
+
+
+    refresh();
+}
+
+bool DynamicWindow::mouse_event_inside(MEVENT mouse_event) {
+    return is_inside_window(this->window, mouse_event.x, mouse_event.y);
+}
+
+void DynamicWindow::set_colored_text(const char* text, UIColorId color_id) {
+    put_centered_colored_text(this->window, text, color_id);
+    wrefresh(this->window);
+}
+
 void put_centered_text(WINDOW *win, const char *text) {
     mvwprintw(win, getmaxy(win) / 2, (getmaxx(win) - strlen(text)) / 2, "%s", text);
 }
