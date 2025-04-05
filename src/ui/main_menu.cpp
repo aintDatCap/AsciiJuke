@@ -8,9 +8,7 @@
 #include <ncurses.h>
 
 namespace UI {
-MainMenu::MainMenu(int32_t height, int32_t width) : BasicWindow(height, width, true) {
-    const int32_t button_width = width / 5;
-    const int32_t button_height = height / 6;
+MainMenu::MainMenu(int32_t height, int32_t width) : DynamicWindow(1.f, 1.f, 0.f, 0.f, true) {
 
     this->exit_button = new DynamicWindow(1.f / 6, 1.f / 5, 1.f / 2, 1.f / 2 - 1.f / 10, true);
     this->exit_button->set_colored_text("EXIT", RED_TEXT);
@@ -49,24 +47,7 @@ UserSelection MainMenu::wait_for_user_selection() {
                 }
             }
         } else if (c == KEY_RESIZE) {
-
-            // Handling screen resizing
-
-            int32_t width, height;
-            getmaxyx(stdscr, height, width);
-
-            wresize(this->window, height, width);
-            werase(this->window);
-
-            refresh();
-
-            if (bordered) {
-                box(this->window, 0, 0);
-            }
-            wrefresh(this->window);
-
-            const int32_t button_width = width / 5;
-            const int32_t button_height = height / 6;
+            this->render();
 
             this->exit_button->render();
             this->exit_button->set_colored_text("EXIT", RED_TEXT);
@@ -78,6 +59,9 @@ UserSelection MainMenu::wait_for_user_selection() {
                 R"(/  _  \__ \ (__| | /\_/ / |_| |   <  __/)", //
                 R"(\_/ \_/___/\___|_|_\___/ \__,_|_|\_\___|)", //
             };
+
+            int32_t height, width;
+            getmaxyx(stdscr, height, width);
 
             draw_art(this->window, logo, 5, height / 7, (width - strlen(logo[0])) / 2, BLUE_TEXT);
         }

@@ -7,7 +7,7 @@
 
 namespace UI {
 
-class MainMenu : BasicWindow {
+class MainMenu : DynamicWindow {
   private:
     DynamicWindow *exit_button;
 

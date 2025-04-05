@@ -11,29 +11,6 @@
 
 namespace UI {
 
-BasicWindow::BasicWindow(int32_t height, int32_t width, bool bordered) {
-    if (bordered) {
-        this->window = new_bordered_window(height, width, 0, 0);
-    } else {
-        this->window = newwin(height, width, 0, 0);
-        refresh();
-    }
-    this->bordered = bordered;
-}
-
-BasicWindow::~BasicWindow() {
-    delwin(this->window);
-}
-
-void BasicWindow::resize_window(int32_t new_height, int32_t new_width) {
-    wresize(this->window, new_height, new_width);
-
-    if(bordered) {
-        box(this->window, 0, 0);
-    }
-}
-
-
 DynamicWindow::DynamicWindow(float_t relative_height, float_t relative_width, float_t relative_start_y, float_t relative_start_x, bool bordered){
     assert(relative_height >= 0 && relative_height <=1 && "The relative_height paramether should be a float between 0 and 1");
     assert(relative_width >= 0 && relative_width <=1 && "The relative_width paramether should be a float between 0 and 1");
@@ -73,8 +50,8 @@ void DynamicWindow::render() {
         box(this->window, 0, 0);
     }
 
-
     refresh();
+    wrefresh(this->window);
 }
 
 bool DynamicWindow::mouse_event_inside(MEVENT mouse_event) {

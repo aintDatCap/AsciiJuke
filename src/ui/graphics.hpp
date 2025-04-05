@@ -25,17 +25,11 @@ typedef enum {
     USER_SELECTION_,
 } UserSelection;
 
-class BasicWindow {
-  protected:
-    WINDOW *window;
-    bool bordered;
-    void resize_window(int32_t new_height, int32_t new_width);
 
-  public:
-    BasicWindow(int32_t height, int32_t width, bool bordered);
-    ~BasicWindow();
-};
-
+/**
+ * @brief ncurses's WINDOW wrapper that given relative size paramethers, helps to keep a consistent UI design
+ * 
+ */
 class DynamicWindow {
   protected:
     WINDOW *window;
@@ -47,6 +41,15 @@ class DynamicWindow {
     float_t relative_start_x;
 
   public:
+  /**
+   * @brief Construct a new Dynamic Window object
+   * 
+   * @param relative_height 
+   * @param relative_width 
+   * @param relative_start_y 
+   * @param relative_start_x 
+   * @param bordered 
+   */
     DynamicWindow(float_t relative_height, float_t relative_width, float_t relative_start_y, float_t relative_start_x,
                   bool bordered);
     ~DynamicWindow();
